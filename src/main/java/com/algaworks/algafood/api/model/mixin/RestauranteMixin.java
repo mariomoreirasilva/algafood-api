@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.algaworks.algafood.domain.model.Cozinha;
+import com.algaworks.algafood.domain.model.Endereco;
 import com.algaworks.algafood.domain.model.FormaPagamento;
 import com.algaworks.algafood.domain.model.Produto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,8 +15,11 @@ public class RestauranteMixin {
 	//no put por exemplo, não vai atualizar o nome da cozinha no http do restaurante. Se colocar no Json o campo nome da cozinha retorna mensagem de erro
 		// se não colocar, não fazia nada, nem mensagem de erro e nem atualização. Mas pode confundir o consumidor da API
 		//colocando o value, .... e allowGetters = true so faz na descerilização(objeto para json(no get por exemplo) e no put não aparece e se colocar o nome da erro)		
-	@JsonIgnoreProperties(value = {"nome"} , allowGetters = true) 
+	@JsonIgnoreProperties(value = "nome", allowGetters = true)
 	private Cozinha cozinha;
+	
+	@JsonIgnore
+	private Endereco endereco;
 	
 	@JsonIgnore
 	private LocalDateTime dataCadastro;

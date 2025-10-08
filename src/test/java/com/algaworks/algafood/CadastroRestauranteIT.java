@@ -18,6 +18,7 @@ import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
+import com.algaworks.algafood.domain.service.CadastroRestauranteService;
 import com.algaworks.algafood.util.DatabaseCleaner;
 
 import io.restassured.RestAssured;
@@ -40,9 +41,14 @@ public class CadastroRestauranteIT {
 	    @Autowired
 	    private RestauranteRepository restauranteRepository;
 	    
+	    @Autowired
+	    private CadastroRestauranteService restauranteService;
+	    
 	    private Restaurante burgerTopRestaurante;
 	    
 	    private int qtdRestaurantes;
+	    
+	    
 	    
 	@Before
 	public void setup() {
@@ -93,7 +99,8 @@ public class CadastroRestauranteIT {
 	        burgerTopRestaurante.setNome("Burger Top");
 	        burgerTopRestaurante.setTaxaFrete(new BigDecimal(10));
 	        burgerTopRestaurante.setCozinha(cozinhaAmericana);
-	        restauranteRepository.save(burgerTopRestaurante);
+	        //restauranteRepository.save(burgerTopRestaurante);
+	        restauranteService.salvar(burgerTopRestaurante);
 	        
 	        Restaurante comidaMineiraRestaurante = new Restaurante();
 	        comidaMineiraRestaurante.setNome("Comida Mineira");

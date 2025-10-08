@@ -104,7 +104,7 @@ public class CadastroCozinhaIT {
 	public void deveRetornarRespostaEEstatosCorretos_quandoConsultarCozinhaExistente() {
 		
 		given()
-		.pathParam("cozinhaId",quantidadeCozinhasCadastradas)
+		.pathParam("cozinhaId",cozinhaAmericana.getId())
 		.accept(ContentType.JSON)
 	.when()
 		.get("/{cozinhaId}")
@@ -131,7 +131,7 @@ public class CadastroCozinhaIT {
 		cozinha1.setNome("Tailandeza");		
 		cozinhaRepository.save(cozinha1);
 		
-		Cozinha cozinhaAmericana = new Cozinha();
+		cozinhaAmericana = new Cozinha();
 		cozinhaAmericana.setNome("Americana");		
 		cozinhaRepository.save(cozinhaAmericana);
 		

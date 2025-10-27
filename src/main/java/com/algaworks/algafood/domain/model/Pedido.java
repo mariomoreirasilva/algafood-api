@@ -2,6 +2,7 @@ package com.algaworks.algafood.domain.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,13 +38,13 @@ public class Pedido {
 	private BigDecimal valorTotal;
 	@CreationTimestamp
 	@Column(nullable = false, columnDefinition = "dateTime")
-	private LocalDateTime dataCriacao;
+	private OffsetDateTime dataCriacao;
 	@Column(columnDefinition = "dateTime")
-	private LocalDateTime dataConfirmacao;
+	private OffsetDateTime dataConfirmacao;
 	@Column(columnDefinition = "dateTime")
-	private LocalDateTime dataCancelamento;
+	private OffsetDateTime dataCancelamento;
 	@Column(columnDefinition = "dateTime")
-	private LocalDateTime dataEntrega;
+	private OffsetDateTime dataEntrega;
 	
 	private StatusPedido status;
 	@Embedded

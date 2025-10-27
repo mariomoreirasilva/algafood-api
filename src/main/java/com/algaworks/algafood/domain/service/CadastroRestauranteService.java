@@ -40,6 +40,21 @@ public class CadastroRestauranteService {
 		return restauranteRepository.save(restaurante);
 	}
 	
+	@Transactional
+	public void ativar(Long restauranteId) {
+		Restaurante restauranteAtual = buscarOuFalha(restauranteId);
+		//restauranteAtual.setAtivo(true);
+		restauranteAtual.ativar();
+	}
+	
+	@Transactional
+	public void desativar(Long restauranteId) {
+		Restaurante restauranteAtual = buscarOuFalha(restauranteId);
+		//restauranteAtual.setAtivo(false);
+		restauranteAtual.desativar();
+	}
+	
+	
 	public Restaurante buscarOuFalha(Long restauranteId) {
 		
 		return restauranteRepository.findById(restauranteId).

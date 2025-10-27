@@ -2,6 +2,7 @@ package com.algaworks.algafood.domain.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +28,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.algaworks.algafood.Groups;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -61,14 +60,16 @@ public class Restaurante {
 		
 	@Embedded
 	private Endereco endereco;
+	
+	private Boolean ativo = Boolean.TRUE;
 		
 	@CreationTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
-	private LocalDateTime dataCadastro;
+	private OffsetDateTime dataCadastro;
 		
 	@UpdateTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
-	private LocalDateTime dataAtualizacao;
+	private OffsetDateTime dataAtualizacao;
 		
 	@ManyToMany
 	@JoinTable(name = "restaurante_forma_pagamento",
@@ -79,5 +80,14 @@ public class Restaurante {
 	
 	@OneToMany(mappedBy = "restaurante")
 	private List<Produto> produtos = new ArrayList<>();
+	
+	public void ativar(){
+		//this.ativo = true;
+		setAtivo(true);
+	}
+	
+	public void desativar(){
+		setAtivo(false);
+	}
 	
 }

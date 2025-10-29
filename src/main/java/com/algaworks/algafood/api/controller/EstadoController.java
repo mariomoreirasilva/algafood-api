@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,11 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algaworks.algafood.api.assembler.EstadoDTOAssembler;
-import com.algaworks.algafood.api.assembler.EstadoInputDTODisassembler;
-import com.algaworks.algafood.api.model.EstadoDTO;
-import com.algaworks.algafood.api.model.input.EstadoInputDTO;
-import com.algaworks.algafood.domain.model.Cozinha;
+import com.algaworks.algafood.api.assembler.EstadoInputDisassembler;
+import com.algaworks.algafood.api.assembler.EstadoModelAssembler;
+import com.algaworks.algafood.api.model.EstadoModel;
+import com.algaworks.algafood.api.model.input.EstadoInput;
 import com.algaworks.algafood.domain.model.Estado;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
 import com.algaworks.algafood.domain.service.CadastroEstadoService;
@@ -37,91 +35,51 @@ public class EstadoController {
 	private CadastroEstadoService cadastroEstado;
 	
 	@Autowired
-	EstadoDTOAssembler estadoDTOAssembler;
+	private EstadoModelAssembler estadoModelAssembler;
 	
 	@Autowired
-	EstadoInputDTODisassembler estadoInputDTODisassembler;
+	private EstadoInputDisassembler estadoInputDisassembler;
 	
 	@GetMapping
-	public List<EstadoDTO> listar() {
-		return estadoDTOAssembler.toListDTO( estadoRepository.findAll());
-	}
-	
-//	@GetMapping("/{estadoId}")
-//	public ResponseEntity<Estado> buscar(@PathVariable Long estadoId) {
-//		Optional<Estado> estado = estadoRepository.findById(estadoId);
-//		
-//		if (estado.isPresent()) {
-//			return ResponseEntity.ok(estado.get());
-//		}
-//		
-//		return ResponseEntity.notFound().build();
+	public List<EstadoModel> listar() {
+		List<Estado> todosEstados = estadoRepository.findAll();
 		
-//	}
+		return estadoModelAssembler.toCollectionModel(todosEstados);
+	}
 	
 	@GetMapping("/{estadoId}")
-	public EstadoDTO buscar(@PathVariable Long estadoId) {
+	public EstadoModel buscar(@PathVariable Long estadoId) {
+		Estado estado = cadastroEstado.buscarOuFalhar(estadoId);
 		
-		System.out.println("Passei por aqui.");		
-		return estadoDTOAssembler.toDTO(cadastroEstado.buscarOuFalha(estadoId));
+		return estadoModelAssembler.toModel(estado);
 	}
-	
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public EstadoDTO adicionar(@RequestBody @Valid EstadoInputDTO estadoInputDTO) {
+	public EstadoModel adicionar(@RequestBody @Valid EstadoInput estadoInput) {
+		Estado estado = estadoInputDisassembler.toDomainObject(estadoInput);
 		
-		Estado estado = estadoInputDTODisassembler.toDomainObjetc(estadoInputDTO);
-		return estadoDTOAssembler.toDTO(cadastroEstado.salvar(estado));
+		estado = cadastroEstado.salvar(estado);
 		
-		//return cadastroEstado.salvar(estado);
+		return estadoModelAssembler.toModel(estado);
 	}
-	
-//	@PutMapping("/{estadoId}")
-//	public ResponseEntity<Estado> atualizar(@PathVariable Long estadoId,
-//			@RequestBody Estado estado) {
-//		Estado estadoAtual = estadoRepository.findById(estadoId).orElse(null);
-//		
-//		if (estadoAtual != null) {
-//			BeanUtils.copyProperties(estado, estadoAtual, "id");
-//			
-//			estadoAtual = cadastroEstado.salvar(estadoAtual);
-//			return ResponseEntity.ok(estadoAtual);
-//		}
-//		
-//		return ResponseEntity.notFound().build();
-//	}
 	
 	@PutMapping("/{estadoId}")
-	public EstadoDTO atualizar(@PathVariable Long estadoId,
-			@RequestBody @Valid EstadoInputDTO estadoInputDTO){
+	public EstadoModel atualizar(@PathVariable Long estadoId,
+			@RequestBody @Valid EstadoInput estadoInput) {
+		Estado estadoAtual = cadastroEstado.buscarOuFalhar(estadoId);
 		
-		Estado estadoAtual = cadastroEstado.buscarOuFalha(estadoId);
-		//BeanUtils.copyProperties(estado, estadoAtual, "id");
-		estadoInputDTODisassembler.copyToDomainObject(estadoInputDTO, estadoAtual);
+		estadoInputDisassembler.copyToDomainObject(estadoInput, estadoAtual);
 		
-		return estadoDTOAssembler.toDTO(cadastroEstado.salvar(estadoAtual));
+		estadoAtual = cadastroEstado.salvar(estadoAtual);
 		
+		return estadoModelAssembler.toModel(estadoAtual);
 	}
 	
-//	@DeleteMapping("/{estadoId}")
-//	public ResponseEntity<?> remover(@PathVariable Long estadoId) {
-//		try {
-//			cadastroEstado.excluir(estadoId);	
-//			return ResponseEntity.noContent().build();
-//			
-//		} catch (EntidadeNaoEncontradaException e) {
-//			return ResponseEntity.notFound().build();
-//			
-//		} catch (EntidadeEmUsoException e) {
-//			return ResponseEntity.status(HttpStatus.CONFLICT)
-//					.body(e.getMessage());
-//		}
-//	}
-	
-	 @DeleteMapping("/{estadoId}")
-	 public void remover(@PathVariable Long estadoId) {
-		  cadastroEstado.excluir(estadoId);
-	 }
+	@DeleteMapping("/{estadoId}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void remover(@PathVariable Long estadoId) {
+		cadastroEstado.excluir(estadoId);	
+	}
 	
 }

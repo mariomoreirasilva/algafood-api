@@ -1,65 +1,58 @@
 package com.algaworks.algafood.domain.service;
 
-import javax.transaction.Transactional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.algaworks.algafood.domain.exception.RestauranteNaoEncontradoException;
+import com.algaworks.algafood.domain.model.Cidade;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
-import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 
 @Service
 public class CadastroRestauranteService {
-	
-	private static final String MSG_COZINHA_NAO_ENCONTADA = "Não existe cadastro de cozinha com código %d";
 
 	@Autowired
 	private RestauranteRepository restauranteRepository;
 	
 	@Autowired
-	private CozinhaRepository cozinhaRepository;
+	private CadastroCozinhaService cadastroCozinha;
 	
 	@Autowired
-	private CadastroCozinhaService cozinhaService;
+	private CadastroCidadeService cadastroCidade;
 	
 	@Transactional
 	public Restaurante salvar(Restaurante restaurante) {
-		
 		Long cozinhaId = restaurante.getCozinha().getId();
+		Long cidadeId = restaurante.getEndereco().getCidade().getId();
+
+		Cozinha cozinha = cadastroCozinha.buscarOuFalhar(cozinhaId);
+		Cidade cidade = cadastroCidade.buscarOuFalhar(cidadeId);
 		
-//		Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
-//			.orElseThrow(() -> new EntidadeNaoEncontradaException(
-//					String.format(MSG_COZINHA_NAO_ENCONTADA, cozinhaId)));
-		Cozinha cozinha = cozinhaService.buscarOuFalhar(cozinhaId);
-		
-		restaurante.setCozinha(cozinha);		
+		restaurante.setCozinha(cozinha);
+		restaurante.getEndereco().setCidade(cidade);
 		
 		return restauranteRepository.save(restaurante);
 	}
 	
 	@Transactional
 	public void ativar(Long restauranteId) {
-		Restaurante restauranteAtual = buscarOuFalha(restauranteId);
-		//restauranteAtual.setAtivo(true);
+		Restaurante restauranteAtual = buscarOuFalhar(restauranteId);
+		
 		restauranteAtual.ativar();
 	}
 	
 	@Transactional
-	public void desativar(Long restauranteId) {
-		Restaurante restauranteAtual = buscarOuFalha(restauranteId);
-		//restauranteAtual.setAtivo(false);
-		restauranteAtual.desativar();
+	public void inativar(Long restauranteId) {
+		Restaurante restauranteAtual = buscarOuFalhar(restauranteId);
+		
+		restauranteAtual.inativar();
 	}
 	
-	
-	public Restaurante buscarOuFalha(Long restauranteId) {
-		
-		return restauranteRepository.findById(restauranteId).
-				orElseThrow(() -> new RestauranteNaoEncontradoException(restauranteId));
-		
+	public Restaurante buscarOuFalhar(Long restauranteId) {
+		return restauranteRepository.findById(restauranteId)
+			.orElseThrow(() -> new RestauranteNaoEncontradoException(restauranteId));
 	}
 	
 }
